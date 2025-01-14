@@ -6,11 +6,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import paf.lecture.consumer.paf_25l_consumer.model.Order;
 import paf.lecture.consumer.paf_25l_consumer.model.Student;
 import paf.lecture.consumer.paf_25l_consumer.model.Todo;
 import paf.lecture.consumer.paf_25l_consumer.service.ConsumerService;
@@ -22,6 +25,9 @@ public class RedisConfig {
 
     @Value("${redis.topic2}")
     private String topic2;
+
+    @Value("${redis.topic3}")
+    private String orderTopic;
 
     @Bean("todoTemplate")
     RedisTemplate<String, Todo> redisTemplate(RedisConnectionFactory connFac, @Qualifier("todoSerializer") Jackson2JsonRedisSerializer<Todo> serializer) {
@@ -83,4 +89,20 @@ public class RedisConfig {
         adapter.setSerializer(new Jackson2JsonRedisSerializer<>(Student.class));
         return adapter;
     }
+
+    @Bean
+    public RedisTemplate<String, Order> redisTemplate2(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Order> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+    @Bean
+    public ChannelTopic topic() {
+        return new ChannelTopic(orderTopic);
+    }
+
+    //Listener needed to listen for the message published by the producer
 }
