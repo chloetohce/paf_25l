@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -105,4 +106,19 @@ public class RedisConfig {
     }
 
     //Listener needed to listen for the message published by the producer
+    private MessageListener messageListener;
+    private RedisConnectionFactory connectionFactory;
+
+    @Bean
+    public MessageListenerAdapter messageListenerAdapter() {
+        return new MessageListenerAdapter(messageListener);
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisContainer(ChannelTopic channelTopic) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(messageListener, channelTopic);
+        return container;
+    }
 }
