@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import paf.lecture.paf_25l.producer.model.Student;
 import paf.lecture.paf_25l.producer.model.Todo;
 
 @Service
@@ -13,8 +14,14 @@ public class ProducerService {
     @Autowired @Qualifier("todo")
     RedisTemplate<String, Todo> redisTemplate;
 
+    @Autowired
+    RedisTemplate<String, Student> studentTemplate;
+
     @Value("${redis.topic1}")
     private String topic1;
+
+    @Value("${redis.topic2}")
+    private String topic2;
 
     /**
      * To publish the comment into the redis queue.
@@ -22,5 +29,9 @@ public class ProducerService {
      */
     public void sendMessage(Todo todo) {
         redisTemplate.convertAndSend(topic1, todo);
+    }
+
+    public void sendStudent(Student s) {
+        studentTemplate.convertAndSend(topic2, s);
     }
 }
