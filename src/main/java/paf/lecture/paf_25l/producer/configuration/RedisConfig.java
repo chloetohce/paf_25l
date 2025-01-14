@@ -1,5 +1,6 @@
 package paf.lecture.paf_25l.producer.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -11,6 +12,9 @@ import paf.lecture.paf_25l.producer.model.Todo;
 
 @Configuration
 public class RedisConfig {
+
+    @Value("${redis.topic3}")
+    String topicOrder;
     
     @Bean("todo")
     RedisTemplate<String, Todo> redisTemplate(RedisConnectionFactory connFac, Jackson2JsonRedisSerializer<Todo> serializer) {
@@ -39,4 +43,12 @@ public class RedisConfig {
     public Jackson2JsonRedisSerializer<Student> jackson2JsonRedisSerializerStudent() {
         return new Jackson2JsonRedisSerializer<>(Student.class);
     }
+
+    @Bean(orderTopic)
+    public RedisTemplate<String, Order> redisTemplate2(RedisConnectionFactory connFac) {
+
+    }
+
+    @Bean
+    
 }
